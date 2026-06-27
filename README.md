@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Smart Parking Management System
 
 A production-ready, full-stack Smart Parking Management System built with **Electron**, **React**, **TypeScript**, **Express**, **Prisma**, and **SQLite**.
@@ -281,3 +282,7 @@ For issues and feature requests, contact the development team.
 ---
 
 **Built with ❤️ using Electron, React, TypeScript, and Express**
+=======
+# smart-parking
+Smart Parking Management System built with Electron, React, Node.js, Express, SQLite, and Prisma for Windows desktop applications.
+>>>>>>> origin/main
