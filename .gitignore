@@ -1,0 +1,11 @@
+node_modules/
+dist/
+release/
+*.db
+*.log
+.env
+.env.local
+.DS_Store
+*.db-journal
+coverage/
+.vscode/settings.json
