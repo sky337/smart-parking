@@ -101,8 +101,13 @@ export class ParkingSlotService {
    * Get slot details
    */
   static async getSlot(slotId: string): Promise<ParkingSlot> {
-    const slot = await prisma.parkingSlot.findUnique({
-      where: { id: slotId },
+    const slot = await prisma.parkingSlot.findFirst({
+      where: {
+        OR: [
+          { id: slotId },
+          { slotNumber: slotId }
+        ]
+      },
       include: { tickets: { take: 1, orderBy: { createdAt: 'desc' } } },
     });
 

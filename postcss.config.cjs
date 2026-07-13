@@ -1,4 +1,4 @@
-// PostCSS Configuration
+// PostCSS Configuration (CommonJS)
 
 module.exports = {
   plugins: {

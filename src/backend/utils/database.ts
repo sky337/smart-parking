@@ -1,16 +1,48 @@
 // Database initialization and Prisma client setup
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import Logger from '@shared/utils/logger';
 
 const logger = new Logger('Database');
 
-const prisma = new PrismaClient({
+// Load @prisma/client with interoperability for CJS/Esm runtimes.
+// Some environments (Electron main bundled as CJS) may produce a module
+// shape where the PrismaClient constructor is nested under `default`.
+// Try require-based loading first (works in CJS builds), fall back
+// to checking common locations on the imported module.
+function loadPrismaClient(): any {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require('@prisma/client');
+
+    // Helper to find the constructor in several possible module shapes
+    const findCtor = (m: any) => {
+      if (!m) return null;
+      if (typeof m === 'function') return m;
+      if (typeof m.PrismaClient === 'function') return m.PrismaClient;
+      if (m.default) {
+        if (typeof m.default === 'function') return m.default;
+        if (typeof m.default.PrismaClient === 'function') return m.default.PrismaClient;
+        if (m.default.default && typeof m.default.default.PrismaClient === 'function') return m.default.default.PrismaClient;
+      }
+      return null;
+    };
+
+    return findCtor(mod) || findCtor(mod.default) || findCtor(mod.default && mod.default.default) || null;
+  } catch (err) {
+    return null;
+  }
+}
+
+const PrismaCtor = loadPrismaClient();
+if (!PrismaCtor) {
+  throw new Error('@prisma/client could not be loaded. Ensure it is installed and compatible with the runtime.');
+}
+
+const prisma = new PrismaCtor({
   errorFormat: 'pretty',
-  log: process.env.NODE_ENV === 'development' 
-    ? ['query', 'error', 'warn'] 
-    : ['error'],
-});
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+}) as Prisma.PrismaClient;
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
@@ -33,7 +65,7 @@ export async function initializeDatabase(): Promise<void> {
     logger.info('Initializing database...');
     
     // Verify connection
-    await prisma.$executeRawUnsafe('SELECT 1');
+    await prisma.$queryRawUnsafe('SELECT 1');
     logger.info('Database connection established');
 
     // Check if database is seeded
@@ -62,7 +94,7 @@ export async function seedDatabase(): Promise<void> {
       data: {
         username: 'admin',
         email: 'admin@parking.local',
-        password: '$2a$10$SQv88.BXjEyVZOEGH1OLz.YKJg7jPo4lbPVWPWzz7Qv2Qkb6mqhPa', // password: Admin@123
+        password: '$2a$10$ce69hcSKRVDoGecQd69TcOlIZeKCSp/wMt/t3Y1l7oL5miYbU83zK', // password: Admin@123
         firstName: 'Admin',
         lastName: 'User',
         role: 'ADMIN',

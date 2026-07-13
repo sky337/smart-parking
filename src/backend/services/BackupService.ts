@@ -23,7 +23,7 @@ export class BackupService {
 
       const backupName = `parking_backup_${Date.now()}`;
       const backupPath = path.join(BackupService.backupDir, `${backupName}.db`);
-      const sourceDb = path.join(process.cwd(), 'parking.db');
+      const sourceDb = path.join(process.cwd(), 'prisma', 'parking.db');
 
       // Copy database file
       if (!fs.existsSync(sourceDb)) {
@@ -76,7 +76,7 @@ export class BackupService {
         throw new BusinessLogicError('Backup file not found');
       }
 
-      const targetDb = path.join(process.cwd(), 'parking.db');
+      const targetDb = path.join(process.cwd(), 'prisma', 'parking.db');
 
       // Disconnect Prisma before replacing database
       await prisma.$disconnect();
